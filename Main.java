@@ -8,17 +8,25 @@ public class Main {
         private int burstTime;
         private int arrivalTime;
         private int priority;
+        private int turnAroundTime;
+        private int waitingTime;
         public Process(String id, int burstTime, int arrivalTime, int priority) {
             this.id = id;
             this.burstTime = burstTime;
             this.arrivalTime = arrivalTime;
             this.priority = priority;
+            this.turnAroundTime = 0;
+            this.waitingTime = 0;
         }
         public String getId() {return id;}
         public int getBurstTime() {return burstTime;}
         public int getArrivalTime() {return arrivalTime;}
         public int getPriority() {return priority;}
+        public int getTurnAroundTime() {return turnAroundTime;}
+        public int getWaitingTime() {return waitingTime;}
         public void setBurstTime(int burstTime) {this.burstTime = burstTime;}
+        public void setTurnAroundTime(int turnAroundTime) {this.turnAroundTime = turnAroundTime;}
+        public void setWaitingTime(int waitingTime) {this.waitingTime = waitingTime;}
         public void setArrivalTime(int arrivalTime) {this.arrivalTime = arrivalTime;}
         public void setPriority(int priority) {this.priority = priority;}
     }
@@ -27,10 +35,13 @@ public class Main {
         private Queue<Process> processQueue;
         private int currentTime;
         private final int quantum;
+        private int numProcesses;
+        private int totalWaitingTime;
         public RRScheduler(ArrayList<Process> processes, int quantum) {
             this.processQueue = new LinkedList<>();
+            this.totalWaitingTime = 0;
             // sorting on process arrival time
-            int numProcesses = processes.size();
+            this.numProcesses = processes.size();
             boolean swapped;
             for (int i = 0; i < numProcesses-1; i++) {
                 swapped = false;
