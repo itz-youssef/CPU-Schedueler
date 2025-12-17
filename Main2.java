@@ -1,6 +1,6 @@
 import java.util.*;
 
-public class Main {
+public class Main2 {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
         ArrayList<Process> processes = new ArrayList<>();
@@ -31,7 +31,12 @@ public class Main {
             System.out.print("Priority (Number): ");
             int priority = scanner.nextInt();
 
-            processes.add(new Process(name, arrivalTime, burstTime, priority));
+            System.out.print("Quantum (Number): ");
+            int Quantum = scanner.nextInt();
+
+
+
+            processes.add(new Process(name, arrivalTime, burstTime, priority,Quantum));
         }
 
 
