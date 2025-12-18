@@ -30,6 +30,12 @@ public class RRScheduler {
         this.quantum = quantum;
         this.contextSwitching = contextSwitching;
     }
+
+    public Vector<String> getExecutionOrder() {
+        return executionOrder;
+    }
+
+
     public void simulate() {
         Queue<Process> finishedProcesses = new LinkedList<>();
         Queue<Process> readyProcesses = new LinkedList<>();
@@ -92,9 +98,11 @@ public class RRScheduler {
                 }
             }
         }
+
+
         double totalWaitingTime = 0;
         double totalTurnAroundTime = 0;
-        System.out.print("Execution Order: ");
+        System.out.print("    Execution Order: ");
         for (String s : executionOrder) {
             System.out.print(s + " ");
         }
@@ -115,16 +123,9 @@ public class RRScheduler {
             if (!swapped) break;
         }
 
-        for (int i = 0; i < numProcesses; i++) {
-            Process temp = sortedProcesses.get(i);
-            totalWaitingTime += temp.getWaitingTime();
-            totalTurnAroundTime += temp.getTurnaroundTime();
-            System.out.println("Process: " + temp.getName() + ", Waiting time: " + temp.getWaitingTime() + ", Turn around time: " + temp.getTurnaroundTime());
-        }
         double avgTurnAroundTime = totalTurnAroundTime / numProcesses;
         double avgWaitingTime = totalWaitingTime / numProcesses;
-        System.out.println("averageWaitingTime: " + avgWaitingTime);
-        System.out.println("averageTurnaroundTime: "+ avgTurnAroundTime);
+
     }
 }
 

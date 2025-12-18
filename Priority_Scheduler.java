@@ -1,6 +1,6 @@
 import java.util.*;
 
-public class PriorityScheduler {
+class PriorityScheduler {
     private ArrayList<Process> processes;
     private int contextSwitching;
     private int agingThreshold;
