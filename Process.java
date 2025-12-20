@@ -94,7 +94,12 @@ public class Process {
         this.remainingTime -= time;  // Reduce remaining burst time
     }
     public void addQuantumToHistory(int timeExecuted) {
+
         this.quantumHistory.add(timeExecuted);
     }
+    public List<Integer> getQuantumHistory() { return quantumHistory; }
+
+
+
 
 }

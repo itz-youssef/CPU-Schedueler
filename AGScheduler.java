@@ -48,7 +48,7 @@ public class AGScheduler {
         return shortestJob;
     }
 
-    private void printINFO(List<Process> finishedProcesses, List<String> executionOrder, int flag) {
+    private void printINFO(List<Process> finishedProcesses, List<String> executionOrder) {
 
         finishedProcesses.sort(Comparator.comparing(Process::getName));
 
@@ -64,11 +64,10 @@ public class AGScheduler {
                     ", Waiting Time: " + process.getWaitingTime() +
                     ", Turnaround Time: " + process.getTurnaroundTime());
 
-            if (flag == 1) {
 
-//                System.out.print(", Quantum History: " + process.getQuantumHistory());
+            System.out.print(", Quantum History: " + process.getQuantumHistory());
 
-            }
+
             System.out.println(" }");
 
             avgWaitingTime += process.getWaitingTime();
@@ -99,6 +98,8 @@ public class AGScheduler {
             default -> p.getQuantumTime();
 
         };
+        p.addQuantumToHistory(newQuantum);
+
 
         p.setQuantumTime(newQuantum);
     }
@@ -111,6 +112,9 @@ public class AGScheduler {
         int i = 0;
 
         Process nextProcess = null;
+        for(Process p : processes ){
+            p.addQuantumToHistory(p.getQuantumTime());
+        }
 
         while (finished_Processes.size() < processes.length) {
             while (i < processes.length && processes[i].getArrivalTime() <= currentTIME) {
@@ -120,7 +124,7 @@ public class AGScheduler {
 
             }
 
-            if (readyQueue.isEmpty()) {
+            if (readyQueue.isEmpty()) { // to check if the first arrival time not = 0 so we will start from it
 
                 if (i < processes.length) {
 
@@ -147,20 +151,20 @@ public class AGScheduler {
             execution_Order.add(p.getName());
 
             int q = p.getQuantumTime();
-            int q1 = (int) Math.ceil(0.25 * q);
+            int q1 = (int) Math.ceil(0.25 * q); //calc the phase 1 n 2 times for the curr process
             int q2 = (int) Math.ceil(0.25 * q);
 
             Boolean is_preempted = false;
 
-            int runtime = 0;
+            int runtime = 0;                   // track the run time for each phase
 
             while (runtime < q1 && p.getRemainingTime() > 0) {
 
-                p.adjustRemainingTime();
+                p.adjustRemainingTime(); // decrement the p's remaining time by 1 _> p--
                 currentTIME++;
                 runtime++;
 
-                while (i < processes.length && processes[i].getArrivalTime() <= currentTIME) {
+                while (i < processes.length && processes[i].getArrivalTime() <= currentTIME) { // to check if another process comes when the first process being excuted
 
                     readyQueue.add(processes[i]);
                     i++;
@@ -171,7 +175,7 @@ public class AGScheduler {
 
             if (p.getRemainingTime() == 0) {
 
-                updateQuantum(p, runtime, 4);
+                updateQuantum(p, runtime, 4); // set quantum time to 0 if its finished
                 finished_Processes.add(p);
                 p.turnaroundTime = currentTIME - p.getArrivalTime();
                 p.waitingTime = p.turnaroundTime - p.burstTime;
@@ -182,17 +186,17 @@ public class AGScheduler {
 
 
 
-            Process higherpriority = get_Best_Priority(readyQueue);
+            Process higherpriority = get_Best_Priority(readyQueue); // get the p's less priority value and it return null if the RQ was empty
             while (runtime < q1 + q2 && p.remainingTime > 0) {
 
-                if (higherpriority != null && higherpriority.priority < p.priority) {
+                if (higherpriority != null && higherpriority.priority < p.priority) { // if there is a process has priority value less than the excuted then adjust its quantum time and add it to RQ
 
                     updateQuantum(p, runtime, 2);
                     readyQueue.add(p);
 
                     if(readyQueue.get(0) != higherpriority) {
 
-                        readyQueue.remove(higherpriority);
+                        readyQueue.remove(higherpriority); //remove the process that will executed from the RQ
                         nextProcess = higherpriority;
 
                     }
@@ -202,7 +206,7 @@ public class AGScheduler {
                 }
 
 
-                p.remainingTime--;
+                p.remainingTime--; // because the condition in loop runtime < q1 so there still a 1 time not executed
                 currentTIME++;
                 runtime++;
 
@@ -227,7 +231,7 @@ public class AGScheduler {
 
             }
 
-            while (runtime < q && runtime >= q1 + q2 && p.remainingTime > 0) {
+            while (runtime < q && runtime >= q1 + q2 && p.remainingTime > 0) { // phase 3 starting check
 
                 Process shortest = getShortestJob(readyQueue);
                 if (shortest != null && shortest.remainingTime < p.remainingTime) {
@@ -277,10 +281,9 @@ public class AGScheduler {
         }
 
         System.out.println("\nAG Scheduling Process info");
-        printINFO(finished_Processes, execution_Order, 1);
+        printINFO(finished_Processes, execution_Order);
     }
 }
-
 //import java.util.*;
 //
 //public class main {
