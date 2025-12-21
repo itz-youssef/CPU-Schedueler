@@ -6,19 +6,28 @@ public class Main {
     // Helper Methods (Validation & Printing)
     // =============================================================
 
+    public static void printExecutionSequence(List<String> order) {
+        System.out.print("   ➤ Execution Order: ");
+        if (order == null || order.isEmpty()) {
+            System.out.println("[None]");
+        } else {
+            System.out.println(String.join(" -> ", order));
+        }
+    }
+
     public static boolean validateResults(String testName, List<String> actualOrder, ArrayList<Process> actualProcesses, Output expectedOutput) {
         boolean passed = true;
         System.out.println("     Validating Results for: " + testName);
 
-        // 1. (Execution Order)
+        // 1. Check Execution Order
         if (!actualOrder.equals(expectedOutput.getProcessesOrder())) {
-            System.out.println("         Order Mismatch!");
+            System.out.println("          Order Mismatch!");
             System.out.println("         Expected: " + expectedOutput.getProcessesOrder());
             System.out.println("         Actual:   " + actualOrder);
             passed = false;
         }
 
-        // 2. (Process Details)
+        // 2. Check Process Details (WT, TAT, Quantum History)
         for (Process act : actualProcesses) {
             outputprocess exp = null;
             for (outputprocess op : expectedOutput.getValidProcesses()) {
@@ -31,7 +40,7 @@ public class Main {
             if (exp != null) {
                 // Check Waiting Time and Turnaround Time
                 if (act.getWaitingTime() != exp.getWaitingTime() || act.getTurnaroundTime() != exp.getTurnaroundTime()) {
-                    System.out.println("         Data Mismatch for " + act.getName() + ":");
+                    System.out.println("          Data Mismatch for " + act.getName() + ":");
                     System.out.println("         Expected -> WT: " + exp.getWaitingTime() + ", TAT: " + exp.getTurnaroundTime());
                     System.out.println("         Actual   -> WT: " + act.getWaitingTime() + ", TAT: " + act.getTurnaroundTime());
                     passed = false;
@@ -40,7 +49,7 @@ public class Main {
                 // Check Quantum History (Specific for AG)
                 if (exp.get_Quantum_History() != null && !exp.get_Quantum_History().isEmpty()) {
                     if (!act.getQuantumHistory().equals(exp.get_Quantum_History())) {
-                        System.out.println("         Quantum History Mismatch for " + act.getName() + ":");
+                        System.out.println("          Quantum History Mismatch for " + act.getName() + ":");
                         System.out.println("         Expected: " + exp.get_Quantum_History());
                         System.out.println("         Actual:   " + act.getQuantumHistory());
                         passed = false;
@@ -49,7 +58,7 @@ public class Main {
             }
         }
 
-        // 3. (Averages)
+        // 3. Check Averages
         double totalWT = 0, totalTAT = 0;
         for (Process p : actualProcesses) {
             totalWT += p.getWaitingTime();
@@ -60,13 +69,13 @@ public class Main {
         double actualAvgTAT = actualProcesses.isEmpty() ? 0 : totalTAT / actualProcesses.size();
 
         if (Math.abs(actualAvgWT - expectedOutput.getAverageWaitingTime()) > 0.01) {
-            System.out.printf("      Avg Waiting Time Mismatch! Expected: %.2f, Actual: %.2f%n",
+            System.out.printf("       Avg Waiting Time Mismatch! Expected: %.2f, Actual: %.2f%n",
                     expectedOutput.getAverageWaitingTime(), actualAvgWT);
             passed = false;
         }
 
         if (Math.abs(actualAvgTAT - expectedOutput.getAverageTurnaroundTime()) > 0.01) {
-            System.out.printf("      Avg Turnaround Time Mismatch! Expected: %.2f, Actual: %.2f%n",
+            System.out.printf("       Avg Turnaround Time Mismatch! Expected: %.2f, Actual: %.2f%n",
                     expectedOutput.getAverageTurnaroundTime(), actualAvgTAT);
             passed = false;
         }
@@ -125,14 +134,19 @@ public class Main {
             SJFScheduler sjf = new SJFScheduler();
             sjf.schedule(currentInput.getProcesses(), currentInput.getContextSwitch());
 
-            boolean isSuccess = validateResults("SJF", sjf.getExecutionOrder(), currentInput.getProcesses(), expectedOutput);
+            ArrayList<String> sjfOrder = sjf.getExecutionOrder();
+
+            boolean isSuccess = validateResults("SJF", sjfOrder, currentInput.getProcesses(), expectedOutput);
 
             if (isSuccess) {
-                System.out.println("     RESULT: PASS");
+                System.out.println("     RESULT:  PASS");
                 sjfPassed++;
             } else {
-                System.out.println("     RESULT: FAIL");
+                System.out.println("     RESULT:  FAIL");
             }
+
+            printExecutionSequence(sjfOrder);
+
             printStats(currentInput.getProcesses());
             System.out.println("-------------------------------------------------");
         }
@@ -155,14 +169,19 @@ public class Main {
             RRScheduler rr = new RRScheduler(rrInput.getProcesses(), rrInput.getRrQuantum(), rrInput.getContextSwitch());
             rr.simulate();
 
-            boolean isSuccess = validateResults("RR", rr.getExecutionOrder(), rrInput.getProcesses(), expectedOutput);
+            Vector<String> rrOrder = rr.getExecutionOrder();
+
+            boolean isSuccess = validateResults("RR", rrOrder, rrInput.getProcesses(), expectedOutput);
 
             if (isSuccess) {
                 System.out.println("    RESULT: PASS");
                 rrPassed++;
             } else {
-                System.out.println("     RESULT: FAIL");
+                System.out.println("     RESULT:  FAIL");
             }
+
+            printExecutionSequence(rrOrder);
+
             printStats(rrInput.getProcesses());
             System.out.println("-------------------------------------------------");
         }
@@ -191,14 +210,19 @@ public class Main {
 
             priority.simulate();
 
-            boolean isSuccess = validateResults("Priority", priority.getExecutionOrder(), priorityInput.getProcesses(), expectedOutput);
+            Vector<String> priorityOrder = priority.getExecutionOrder();
+
+            boolean isSuccess = validateResults("Priority", priorityOrder, priorityInput.getProcesses(), expectedOutput);
 
             if (isSuccess) {
-                System.out.println("    RESULT: PASS");
+                System.out.println("    RESULT:  PASS");
                 priorityPassed++;
             } else {
-                System.out.println("     RESULT: FAIL");
+                System.out.println("     RESULT:  FAIL");
             }
+
+            printExecutionSequence(priorityOrder);
+
             printStats(priorityInput.getProcesses());
             System.out.println("-------------------------------------------------");
         }
@@ -225,16 +249,20 @@ public class Main {
             ag.StartSimulation(processesArray);
 
             ArrayList<Process> agFinished = new ArrayList<>(ag.getFinishedProcesses());
+
             List<String> agOrder = ag.getExecutionOrder();
 
             boolean isSuccess = validateResults("AG", agOrder, agFinished, expectedOutput);
 
             if (isSuccess) {
-                System.out.println("    RESULT: PASS");
+                System.out.println("    RESULT:  PASS");
                 agPassed++;
             } else {
-                System.out.println("     RESULT: FAIL");
+                System.out.println("     RESULT:  FAIL");
             }
+
+            printExecutionSequence(agOrder);
+
             printStats(agFinished);
             System.out.println("-------------------------------------------------");
         }
