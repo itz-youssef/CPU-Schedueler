@@ -52,36 +52,19 @@ public class AGScheduler {
 
         finishedProcesses.sort(Comparator.comparing(Process::getName));
 
-        System.out.println("Execution Order: " + executionOrder);
-
         double avgWaitingTime = 0, avgTurnaroundTime = 0;
 
-        System.out.println("Process Results: [");
-
         for (Process process : finishedProcesses) {
-
-            System.out.print("{ Name: " + process.getName() +
-                    ", Waiting Time: " + process.getWaitingTime() +
-                    ", Turnaround Time: " + process.getTurnaroundTime());
-
-
-            System.out.print(", Quantum History: " + process.getQuantumHistory());
-
-
-            System.out.println(" }");
 
             avgWaitingTime += process.getWaitingTime();
             avgTurnaroundTime += process.getTurnaroundTime();
 
         }
 
-        System.out.println("],");
 
         double final_Avg_Wait = avgWaitingTime / finishedProcesses.size();
         double final_Avg_Turn = avgTurnaroundTime / finishedProcesses.size();
 
-        System.out.println("Average Waiting Time: " + (Math.round(final_Avg_Wait * 100.0) / 100.0));
-        System.out.println("Average Turnaround Time: " + (Math.round(final_Avg_Turn * 100.0) / 100.0) + "\n");
     }
 
     public void updateQuantum(Process p, int time_executed, int scenario) {
@@ -280,50 +263,13 @@ public class AGScheduler {
             }
         }
 
-        System.out.println("\nAG Scheduling Process info");
-        printINFO(finished_Processes, execution_Order);
+    }
+
+    public List<String> getExecutionOrder() {
+        return execution_Order;
+    }
+
+    public List<Process> getFinishedProcesses() {
+        return finished_Processes;
     }
 }
-//import java.util.*;
-//
-//public class main {
-//    public static void main(String[] args) {
-//        Process[] processes = {
-//                new Process("P1", 0, 17, 4, 7),
-//                new Process("P2", 2, 6, 7, 9),
-//                new Process("P3", 5, 11, 3, 4),
-//                new Process("P4", 15, 4, 6, 6)
-//        };
-//
-//        AGScheduler scheduler = new AGScheduler();
-//        scheduler.StartSimulation(processes);
-//
-//        // Expected output for comparison
-//        List<String> expectedExecutionOrder = Arrays.asList("P1", "P2", "P3", "P2", "P1", "P3", "P4", "P3", "P1", "P4");
-//
-//        // Print the execution order from the scheduler
-//        System.out.println("Execution Order: " + scheduler.execution_Order);
-//        System.out.println("Expected Execution Order: " + expectedExecutionOrder);
-//
-//        // Calculate the average waiting time and turnaround time
-//        double avgWaitingTime = 0, avgTurnaroundTime = 0;
-//        for (Process p : scheduler.finished_Processes) {
-//            avgWaitingTime += p.getWaitingTime();
-//            avgTurnaroundTime += p.getTurnaroundTime();
-//        }
-//        avgWaitingTime /= scheduler.finished_Processes.size();
-//        avgTurnaroundTime /= scheduler.finished_Processes.size();
-//
-//        // Print the process results
-//        System.out.println("Process Results: ");
-//        for (Process p : scheduler.finished_Processes) {
-//            System.out.println("Name: " + p.getName() + ", Waiting Time: " + p.getWaitingTime() +
-//                    ", Turnaround Time: " + p.getTurnaroundTime() );
-////                    ", Quantum History: " + p.getQuantumHistory());
-//        }
-//
-//        // Print the average waiting time and turnaround time
-//        System.out.println("Average Waiting Time: " + avgWaitingTime);
-//        System.out.println("Average Turnaround Time: " + avgTurnaroundTime);
-//    }
-//}

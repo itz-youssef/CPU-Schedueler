@@ -84,6 +84,10 @@ public class Process {
     public int getPhase() { return phase; }
     public void setPhase(int phase) { this.phase = phase; }
 
+    public void setPriority(int priority) {
+        this.priority = priority;
+    }
+
     public String toString() {
         return "Process{" + "name='" + name + '\'' + ", arrival=" + arrivalTime +
                 ", burst=" + burstTime + ", priority=" + priority + '}';
